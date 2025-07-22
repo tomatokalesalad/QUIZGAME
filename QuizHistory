@@ -1,0 +1,25 @@
+public class QuestionResult
+{
+    public string txtQuestion.Text { get; set; }
+    public string selected { get; set; }
+    public string CorrectAnswer { get; set; }
+    public bool IsCorrect => selected == _question.CorrectAnswer;
+}
+
+//saving results to a file
+using System.Text.Json;
+
+//save to file
+string fileName = $"quiz_{DateTime.Now:yyyyMMdd_HHmmss}.json";
+File.WriteAllText(fileName, JsonSerializer.Serialize(result));
+
+//loading previous results
+var loadedResult = JsonSerializer.Deserialize<QuizResult>(File.ReadAllText(fileName));
+
+foreach (var q in loadedResult.QuestionResults)
+{
+    Console.WriteLine($"Q: {txtQuestion.Text}");
+    Console.WriteLine($"Your Answer: {selected}");
+    Console.WriteLine($"Correct Answer: {_question.CorrectAnswer}");
+    Console.WriteLine(q.IsCorrect ? "Correct" : "Incorrect");
+}
