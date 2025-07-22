@@ -7,7 +7,9 @@ namespace QuizGame1WPF
 {
     public partial class SignUpWindow : Window
     {
-        private string ConnStr = @"Server=localhost;Database=QuizGameDB;Trusted_Connection=True;";
+        private const string ConnStr =
+            "Server=localhost\\SQLEXPRESS;Database=QuizGameDB;" +
+            "Trusted_Connection=True;Encrypt=True;TrustServerCertificate=True;";
 
         public SignUpWindow(string role)  // <-- constructor with role parameter
         {
