@@ -1,5 +1,5 @@
 using System.Windows;
-using System.Windowss.Controls;
+using System.Windows.Controls;
 namespace QuizGame1WPF
 {
     public partial class GameModeSelectorWindow : Window

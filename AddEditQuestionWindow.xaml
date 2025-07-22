@@ -3,29 +3,51 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Add / Edit Question" Height="450" Width="400"
         WindowStartupLocation="CenterScreen">
-    <Grid Margin="10" RowDefinitions="Auto,*,Auto">
-        <StackPanel Margin="10" VerticalAlignment="Top" Spacing="8">
 
-            <TextBox x:Name="txtQuestion" PlaceholderText="Enter question..." />
-            <TextBox x:Name="txtOptionA" PlaceholderText="Option A" />
-            <TextBox x:Name="txtOptionB" PlaceholderText="Option B" />
-            <TextBox x:Name="txtOptionC" PlaceholderText="Option C" />
-            <TextBox x:Name="txtOptionD" PlaceholderText="Option D" />
-            <ComboBox x:Name="cmbCorrect" PlaceholderText="Correct Answer">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Question Input Fields -->
+        <StackPanel Grid.Row="0" Margin="10" VerticalAlignment="Top">
+            <TextBlock Text="Question:"/>
+            <TextBox x:Name="txtQuestion" Margin="0,5,0,10"/>
+
+            <TextBlock Text="Option A:"/>
+            <TextBox x:Name="txtOptionA" Margin="0,5,0,10"/>
+
+            <TextBlock Text="Option B:"/>
+            <TextBox x:Name="txtOptionB" Margin="0,5,0,10"/>
+
+            <TextBlock Text="Option C:"/>
+            <TextBox x:Name="txtOptionC" Margin="0,5,0,10"/>
+
+            <TextBlock Text="Option D:"/>
+            <TextBox x:Name="txtOptionD" Margin="0,5,0,10"/>
+
+            <TextBlock Text="Correct Answer:"/>
+            <ComboBox x:Name="cmbCorrect" Margin="0,5,0,10">
                 <ComboBoxItem Content="A"/>
                 <ComboBoxItem Content="B"/>
                 <ComboBoxItem Content="C"/>
                 <ComboBoxItem Content="D"/>
             </ComboBox>
-            <TextBox x:Name="txtCategory" PlaceholderText="Category" />
-            <ComboBox x:Name="cmbDifficulty" PlaceholderText="Difficulty">
+
+            <TextBlock Text="Category:"/>
+            <TextBox x:Name="txtCategory" Margin="0,5,0,10"/>
+
+            <TextBlock Text="Difficulty:"/>
+            <ComboBox x:Name="cmbDifficulty" Margin="0,5,0,10">
                 <ComboBoxItem Content="Easy"/>
                 <ComboBoxItem Content="Medium"/>
                 <ComboBoxItem Content="Hard"/>
             </ComboBox>
         </StackPanel>
 
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+        <!-- Save / Cancel Buttons -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
             <Button Content="Save" Width="80" Margin="5" Click="Save_Click"/>
             <Button Content="Cancel" Width="80" Margin="5" Click="Cancel_Click"/>
         </StackPanel>

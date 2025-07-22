@@ -4,11 +4,18 @@ namespace QuizGame1WPF
 {
     public partial class App : Application
     {
-        protected override void OnStartup(StartupEventArgs e)
+        private void OnStartup(object sender, StartupEventArgs e)
         {
-            base.OnStartup(e);
             LoginWindow login = new LoginWindow();
-            login.Show();
+            if (login.ShowDialog() == true)
+            {
+                var main = new MainWindow(); // or your GameModeSelectorWindow
+                main.Show();
+            }
+            else
+            {
+                Shutdown(); // closes the app if login was cancelled
+            }
         }
     }
 }
