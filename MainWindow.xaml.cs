@@ -1,69 +1,63 @@
-﻿using System;
-using System.Security.Cryptography;
-using System.Text;
+﻿using Microsoft.Data.SqlClient;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace QuizGame1WPF
+namespace QuizGame1WPF;
+
+public partial class MainWindow : Window
 {
-    public partial class MainWindow : Window
+    private const string ConnStr =
+        "Server=localhost\\SQLEXPRESS;Database=QuizGameDB;" +
+        "Trusted_Connection=True;Encrypt=True;TrustServerCertificate=True;";
+
+    public MainWindow()
     {
-        public MainWindow()
+        InitializeComponent();
+    }
+
+    private void Login_Click(object sender, RoutedEventArgs e)
+    {
+        string username = UsernameBox.Text.Trim();
+        string password = PasswordBox.Password;
+        string role = ((ComboBoxItem)RoleBox.SelectedItem)?.Content?.ToString() ?? "";
+
+        using var con = new SqlConnection(ConnStr);
+        try
         {
-            InitializeComponent();
-        }
+            con.Open();
+            var cmd = new SqlCommand("""
+                SELECT COUNT(*) FROM Users
+                WHERE Username=@u AND Password=@p AND Role=@r
+                """, con);
+            cmd.Parameters.AddWithValue("@u", username);
+            cmd.Parameters.AddWithValue("@p", password);
+            cmd.Parameters.AddWithValue("@r", role);
 
-        // Handle Login button click
-        private void loginButton_Click(object sender, RoutedEventArgs e)
-        {
-            string username = usernameTextBox.Text.Trim();
-            string password = passwordBox.Password.Trim();
-
-            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
-            {
-                MessageBox.Show("Please enter both username and password.");
-                return;
-            }
-
-            string passwordHash = ComputeSha256Hash(password);
-
-            if (DatabaseHelper.ValidateUser(username, passwordHash))
-            {
-                MessageBox.Show("Login successful!");
-
-                TeacherDashboard dashboard = new TeacherDashboard(); // Make sure this exists
-                dashboard.Show();
-                this.Close();
-            }
+            int match = (int)cmd.ExecuteScalar();
+            if (match == 1)
+                MessageBox.Show($"✅ Logged in as {role}!");
             else
-            {
-                MessageBox.Show("Invalid username or password.");
-            }
+                MessageBox.Show("❌ Invalid credentials.");
         }
-
-        // Handle Sign Up button click
-        private void SignUpButton_Click(object sender, RoutedEventArgs e)
+        catch (Exception ex)
         {
-            SignUpWindow signUpWindow = new SignUpWindow();
-            signUpWindow.Owner = this;
-            signUpWindow.ShowDialog();
+            MessageBox.Show("Error: " + ex.Message);
         }
+    }
 
-        // SHA-256 hashing for secure password storage
-        private string ComputeSha256Hash(string rawData)
+    private void SignUp_Click(object sender, RoutedEventArgs e)
+    {
+        string role = ((ComboBoxItem)RoleBox.SelectedItem)?.Content?.ToString() ?? "";
+        if (role == "")
         {
-            using (SHA256 sha256Hash = SHA256.Create())
-            {
-                byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(rawData));
-                StringBuilder builder = new StringBuilder();
-
-                foreach (byte b in bytes)
-                {
-                    builder.Append(b.ToString("x2"));
-                }
-
-                return builder.ToString();
-            }
+            MessageBox.Show("Please select a role first.");
+            return;
         }
+
+        var win = new SignUpWindow(role)
+        {
+            Owner = this
+        };
+        win.ShowDialog();
     }
 }

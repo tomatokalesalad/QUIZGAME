@@ -1,63 +1,60 @@
-﻿using System.Windows;
-using Microsoft.Data.SqlClient;
+﻿using System;
+using System.Data.SqlClient;
+using System.Windows;
+using System.Windows.Controls;
 
 namespace QuizGame1WPF
 {
     public partial class SignUpWindow : Window
     {
-        public SignUpWindow()
+        private string ConnStr = @"Server=localhost;Database=QuizGameDB;Trusted_Connection=True;";
+
+        public SignUpWindow(string role)  // <-- constructor with role parameter
         {
-            InitializeComponent(); // only one definition
+            InitializeComponent();
+            RoleBox.SelectedIndex = role == "Student" ? 0 : 1;  // Pre-select Student or Teacher
         }
 
-        private void SignUpButton_Click(object sender, RoutedEventArgs e)
+        public SignUpWindow()  // default constructor for XAML design-time support (optional)
         {
-            string username = UsernameInput.Text.Trim();
-            string password = PasswordInput.Password.Trim();
-            string confirmPassword = ConfirmPasswordInput.Password.Trim();
+            InitializeComponent();
+        }
 
-            if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+        private void Create_Click(object sender, RoutedEventArgs e)
+        {
+            string user = UserBox.Text.Trim();
+            string pass = PassBox.Password;
+            string role = (RoleBox.SelectedItem as ComboBoxItem)?.Content.ToString();
+            string id = IdBox.Text.Trim();
+
+            if (string.IsNullOrEmpty(user) || string.IsNullOrEmpty(pass) ||
+                string.IsNullOrEmpty(role) || string.IsNullOrEmpty(id))
             {
-                MessageBox.Show("Please fill in all fields.", "Validation", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Please fill all fields.");
                 return;
             }
 
-            if (password != confirmPassword)
+            using var con = new SqlConnection(ConnStr);
+            con.Open();
+
+            var chk = new SqlCommand("SELECT COUNT(*) FROM Users WHERE Username=@u", con);
+            chk.Parameters.AddWithValue("@u", user);
+            if ((int)chk.ExecuteScalar() > 0)
             {
-                MessageBox.Show("Passwords do not match.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Username already taken.");
                 return;
             }
 
-            string connectionString = "Data Source=localhost;Initial Catalog=QuizGameDB;Integrated Security=True";
+            var cmd = new SqlCommand("INSERT INTO Users (Username, Password, Role, StudentID, InstructorID) VALUES (@u, @p, @r, @sid, @tid)", con);
+            cmd.Parameters.AddWithValue("@u", user);
+            cmd.Parameters.AddWithValue("@p", pass);
+            cmd.Parameters.AddWithValue("@r", role);
+            cmd.Parameters.AddWithValue("@sid", role == "Student" ? id : DBNull.Value);
+            cmd.Parameters.AddWithValue("@tid", role == "Teacher" ? id : DBNull.Value);
+            cmd.ExecuteNonQuery();
 
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                try
-                {
-                    connection.Open();
-                    string query = "INSERT INTO Users (Username, Password) VALUES (@username, @password)";
-                    using (SqlCommand command = new SqlCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@username", username);
-                        command.Parameters.AddWithValue("@password", password); // Consider hashing
-
-                        int rows = command.ExecuteNonQuery();
-                        if (rows > 0)
-                        {
-                            MessageBox.Show("Account created successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-                            this.Close();
-                        }
-                        else
-                        {
-                            MessageBox.Show("Sign-up failed. Try again.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                        }
-                    }
-                }
-                catch (SqlException ex)
-                {
-                    MessageBox.Show("Database error:\n" + ex.Message, "DB Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-            }
+            MessageBox.Show("Account created successfully!");
+            Close();
         }
     }
 }
