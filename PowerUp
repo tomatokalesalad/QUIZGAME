@@ -1,3 +1,35 @@
+//define powerups
+public enum PowerUpType
+{
+    FiftyFifty,
+    SkipQuestion,
+    DoublePoints
+}
+
+public class PowerUp
+{
+    public PowerUpType Type { get; set; }
+    public string Description { get; set; }
+    public bool IsUsed { get; set; } = false;
+
+    public PowerUp(PowerUpType type)
+    {
+        Type = type;
+        Description = GetDescription(type);
+    }
+
+    private string GetDescription(PowerUpType type)
+    {
+        return type switch
+        {
+            PowerUpType.FiftyFifty => "Eliminate two incorrect options.",
+            PowerUpType.SkipQuestion => "Skip the current question without penalty.",
+            PowerUpType.DoublePoints => "Earn double points for the next correct answer.",
+            _ => "Unknown power-up"
+        };
+    }
+}
+
 //add powerups to player
 public class Player
 {
