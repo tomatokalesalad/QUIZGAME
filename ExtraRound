@@ -1,0 +1,71 @@
+using System;
+using System.Collections.Generic;
+using System.Threading;
+
+public class QuizGame
+{
+    public int Score { get; set; }
+    private List<Question> bonusQuestions;
+
+    public QuizGame()
+    {
+        Score = 0;
+        bonusQuestions = new List<Question>
+        {
+            new Question("What is the capital of Japan?", "Tokyo"),
+            new Question("2 + 2 * 2 = ?", "6"),
+            new Question("What gas do humans breathe in?", "Oxygen"),
+        };
+    }
+
+    public void StartBonusRound()
+    {
+        Console.WriteLine("\n⚡ BONUS ROUND ⚡");
+        Console.WriteLine("You have 5 seconds per question. Correct answers give DOUBLE POINTS!\n");
+
+        foreach (var q in bonusQuestions)
+        {
+            Console.WriteLine(q.Text);
+            bool answeredInTime = GetAnswerWithinTime(out string answer, 5);
+
+            if (answeredInTime && answer.Equals(q.Answer, StringComparison.OrdinalIgnoreCase))
+            {
+                Console.WriteLine("Correct! +X points");
+                Score += 20; // Double points
+            }
+            else if (!answeredInTime)
+            {
+                Console.WriteLine("⏳ Time’s up! No points.");
+            }
+            else
+            {
+                Console.WriteLine($"Wrong! The correct answer was: {q.Answer}");
+            }
+            Console.WriteLine();
+        }
+
+        Console.WriteLine($"Bonus Round Over! Total Score: {Score}");
+    }
+
+    private bool GetAnswerWithinTime(out string answer, int timeLimitSeconds)
+    {
+        answer = null;
+        var timer = new Timer(_ => { Console.WriteLine("\n[Time expired!]"); Environment.Exit(0); }, null, timeLimitSeconds * 1000, Timeout.Infinite);
+        Console.Write("Your Answer: ");
+        answer = Console.ReadLine();
+        timer.Dispose();
+        return true; // Answered in time
+    }
+}
+
+public class Question
+{
+    public string Text { get; set; }
+    public string Answer { get; set; }
+
+    public Question(string text, string answer)
+    {
+        Text = text;
+        Answer = answer;
+    }
+}
