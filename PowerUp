@@ -1,0 +1,45 @@
+//add powerups to player
+public class Player
+{
+    public string username { get; set; }
+    public int Score { get; set; }
+    public List<PowerUp> PowerUps { get; set; } = new List<PowerUp>();
+
+    public void AwardPowerUp(PowerUpType type)
+    {
+        PowerUps.Add(new PowerUp(type));
+        Console.WriteLine($"{username} earned a {type} power-up!");
+    }
+
+    public void UsePowerUp(PowerUpType type)
+    {
+        var powerUp = PowerUps.FirstOrDefault(p => p.Type == type && !p.IsUsed);
+        if (powerUp != null)
+        {
+            powerUp.IsUsed = true;
+            Console.WriteLine($"{Name} used {type}!");
+            // Apply the effect depending on the type
+            ApplyPowerUpEffect(type);
+        }
+        else
+        {
+            Console.WriteLine($"No unused {type} power-up available.");
+        }
+    }
+
+    private void ApplyPowerUpEffect(PowerUpType type)
+    {
+        switch (type)
+        {
+            case PowerUpType.FiftyFifty:
+                Console.WriteLine("50/50 activated: Two wrong choices removed!");
+                break;
+            case PowerUpType.SkipQuestion:
+                Console.WriteLine("Skipped question.");
+                break;
+            case PowerUpType.DoublePoints:
+                Console.WriteLine("Next correct answer will give double points!");
+                break;
+        }
+    }
+}
