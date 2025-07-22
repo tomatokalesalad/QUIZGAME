@@ -1,0 +1,76 @@
+using System;
+using System.IO;
+using Microsoft.Win32;
+
+public class DatabaseManager
+{
+    private readonly string dbPath = "quiz.db"; // Path to your database file
+
+    // Backup database
+    public void BackupDatabase()
+    {
+        try
+        {
+            var saveDialog = new SaveFileDialog
+            {
+                FileName = $"quiz_backup_{DateTime.Now:yyyyMMdd_HHmmss}.db",
+                Filter = "SQLite Database (*.db)|*.db"
+            };
+
+            if (saveDialog.ShowDialog() == true)
+            {
+                File.Copy(dbPath, saveDialog.FileName, true);
+                Console.WriteLine($"✅ Backup successful! File saved to: {saveDialog.FileName}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Backup failed: {ex.Message}");
+        }
+    }
+
+    // Restore database
+    public void RestoreDatabase()
+    {
+        try
+        {
+            var openDialog = new OpenFileDialog
+            {
+                Filter = "SQLite Database (*.db)|*.db"
+            };
+
+            if (openDialog.ShowDialog() == true)
+            {
+                File.Copy(openDialog.FileName, dbPath, true);
+                Console.WriteLine($"✅ Restore successful! Database replaced with: {openDialog.FileName}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Restore failed: {ex.Message}");
+        }
+    }
+}
+
+
+
+
+var dbManager = new DatabaseManager();
+
+Console.WriteLine("1. Backup Database");
+Console.WriteLine("2. Restore Database");
+Console.Write("Choose option: ");
+string choice = Console.ReadLine();
+
+switch (choice)
+{
+    case "1":
+        dbManager.BackupDatabase();
+        break;
+    case "2":
+        dbManager.RestoreDatabase();
+        break;
+    default:
+        Console.WriteLine("Invalid choice.");
+        break;
+}
