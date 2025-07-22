@@ -88,5 +88,10 @@ namespace QuizGame1WPF
         {
             MessageBox.Show("View Scores feature is coming soon.");
         }
+
+        private void QuestionsGrid_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+
+        }
     }
 }

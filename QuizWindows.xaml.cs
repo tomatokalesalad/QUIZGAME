@@ -1,12 +1,12 @@
 using System.Windows;
 using System.Windows.Controls;
-using QuizGame1WPF.Models;
+using QuizGame1WPF.Models; 
 
 namespace QuizGame1WPF
 {
     public partial class QuizWindow : Window
     {
-        private TimerHelper _timer;
+        private TimerHelper _timer = null!;
         private int _timePerQuestion = 30; // seconds
         private QuestionModel _question;
 
