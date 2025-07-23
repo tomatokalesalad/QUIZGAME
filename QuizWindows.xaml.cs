@@ -1,6 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
-using QuizGame1WPF.Models; 
+using QuizGame1WPF.Models;
 
 namespace QuizGame1WPF
 {
@@ -30,7 +30,10 @@ namespace QuizGame1WPF
         private void StartTimer()
         {
             _timer = new TimerHelper();
-            _timer.OnTick += (seconds) => txtTimer.Text = seconds + "s";
+            _timer.OnTick += (seconds) =>
+            {
+                txtTimer.Text = "Time Left: " + seconds + "s";
+            };
             _timer.OnTimeUp += () =>
             {
                 MessageBox.Show("Time's up!");

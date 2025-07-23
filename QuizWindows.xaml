@@ -1,7 +1,7 @@
-<Window x:Class="QuizGame1WPF.QuizWindows"
+<Window x:Class="QuizGame1WPF.QuizWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Quiz" Height="500" Width="658"
+        Title="QuizWindow" Height="450" Width="800"
         WindowStartupLocation="CenterScreen"
         Background="#FF181A1B">
     <Border BorderBrush="#22FFD9" BorderThickness="4" CornerRadius="30" Padding="20" Margin="10">
@@ -24,8 +24,8 @@
                            VerticalAlignment="Center"/>
             </Border>
 
-            <!-- Answers Area -->
-            <Grid Grid.Row="1" Margin="30,62,10,28" Grid.RowSpan="2" RenderTransformOrigin="0.555,0.496">
+            <!-- Options A-D -->
+            <Grid Grid.Row="1" Margin="30,62,10,28" Grid.RowSpan="2">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
@@ -36,34 +36,59 @@
                 </Grid.ColumnDefinitions>
 
                 <!-- A -->
-                <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" Margin="0,0,20,20" VerticalAlignment="Center">
-                    <TextBlock Text="A." FontWeight="Bold" FontSize="22" Foreground="#22FFD9" Margin="0,0,10,0"/>
-                    <TextBox Width="200" Height="40" Background="#11F6FF" Foreground="#222" FontSize="18" BorderThickness="2" BorderBrush="#22FFD9"/>
-                </StackPanel>
+                <RadioButton x:Name="optA"
+                             Grid.Row="0" Grid.Column="0"
+                             Content="Option A"
+                             FontSize="18"
+                             Foreground="#222"
+                             Background="#11F6FF"
+                             BorderBrush="#22FFD9"
+                             BorderThickness="2"
+                             Padding="10"
+                             Margin="0,0,20,20"
+                             GroupName="Options"
+                             VerticalAlignment="Center"/>
+
                 <!-- B -->
-                <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Margin="0,0,0,20" VerticalAlignment="Center">
-                    <TextBlock Text="B." FontWeight="Bold" FontSize="22" Foreground="#22FFD9" Margin="0,0,10,0"/>
-                    <TextBox Width="200" Height="40" Background="#11F6FF" Foreground="#222" FontSize="18" BorderThickness="2" BorderBrush="#22FFD9" RenderTransformOrigin="0.5,0.5">
-                        <TextBox.RenderTransform>
-                            <TransformGroup>
-                                <ScaleTransform/>
-                                <SkewTransform AngleY="-0.281"/>
-                                <RotateTransform/>
-                                <TranslateTransform Y="-0.49"/>
-                            </TransformGroup>
-                        </TextBox.RenderTransform>
-                    </TextBox>
-                </StackPanel>
+                <RadioButton x:Name="optB"
+                             Grid.Row="0" Grid.Column="1"
+                             Content="Option B"
+                             FontSize="18"
+                             Foreground="#222"
+                             Background="#11F6FF"
+                             BorderBrush="#22FFD9"
+                             BorderThickness="2"
+                             Padding="10"
+                             Margin="0,0,0,20"
+                             GroupName="Options"
+                             VerticalAlignment="Center"/>
+
                 <!-- C -->
-                <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" Margin="0,0,20,0" VerticalAlignment="Center">
-                    <TextBlock Text="C." FontWeight="Bold" FontSize="22" Foreground="#22FFD9" Margin="0,0,10,0"/>
-                    <TextBox Width="200" Height="40" Background="#11F6FF" Foreground="#222" FontSize="18" BorderThickness="2" BorderBrush="#22FFD9"/>
-                </StackPanel>
+                <RadioButton x:Name="optC"
+                             Grid.Row="1" Grid.Column="0"
+                             Content="Option C"
+                             FontSize="18"
+                             Foreground="#222"
+                             Background="#11F6FF"
+                             BorderBrush="#22FFD9"
+                             BorderThickness="2"
+                             Padding="10"
+                             Margin="0,0,20,0"
+                             GroupName="Options"
+                             VerticalAlignment="Center"/>
+
                 <!-- D -->
-                <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                    <TextBlock Text="D." FontWeight="Bold" FontSize="22" Foreground="#22FFD9" Margin="0,0,10,0"/>
-                    <TextBox Width="200" Height="40" Background="#11F6FF" Foreground="#222" FontSize="18" BorderThickness="2" BorderBrush="#22FFD9"/>
-                </StackPanel>
+                <RadioButton x:Name="optD"
+                             Grid.Row="1" Grid.Column="1"
+                             Content="Option D"
+                             FontSize="18"
+                             Foreground="#222"
+                             Background="#11F6FF"
+                             BorderBrush="#22FFD9"
+                             BorderThickness="2"
+                             Padding="10"
+                             GroupName="Options"
+                             VerticalAlignment="Center"/>
             </Grid>
 
             <!-- Time Left and Submit Button -->
@@ -72,12 +97,15 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Text="Time Left: 00:30"
+
+                <TextBlock x:Name="txtTimer"
+                           Text="Time Left: 30s"
                            FontWeight="Bold"
                            FontSize="20"
                            Foreground="Aquamarine"
                            Grid.Column="0"
                            VerticalAlignment="Center"/>
+
                 <Button Content="Submit"
                         Width="120"
                         Height="40"
@@ -85,11 +113,12 @@
                         Foreground="#222"
                         FontWeight="Bold"
                         FontSize="18"
-                        Margin="0,0,0,0"
                         Grid.Column="1"
                         HorizontalAlignment="Right"
-                        VerticalAlignment="Center"/>
+                        VerticalAlignment="Center"
+                        Click="Submit_Click"/>
             </Grid>
         </Grid>
     </Border>
 </Window>
+

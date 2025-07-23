@@ -7,8 +7,9 @@ namespace QuizGame1WPF;
 public partial class MainWindow : Window
 {
     private const string ConnStr =
-        "Server=localhost\\SQLEXPRESS;Database=QuizGameDB;" +
-        "Trusted_Connection=True;Encrypt=True;TrustServerCertificate=True;";
+@"Server=localhost\\SQLEXPRESS;Database=QuizGameDB;" +
+"Trusted_Connection=True;Encrypt=True;TrustServerCertificate=True;";
+
 
     public MainWindow()
     {
@@ -25,10 +26,9 @@ public partial class MainWindow : Window
         try
         {
             con.Open();
-            var cmd = new SqlCommand("""
-                SELECT COUNT(*) FROM Users
-                WHERE Username=@u AND Password=@p AND Role=@r
-                """, con);
+            var cmd = new SqlCommand(
+                "SELECT COUNT(*) FROM Users " +
+                "WHERE Username=@u AND Password=@p AND Role=@r", con);
             cmd.Parameters.AddWithValue("@u", username);
             cmd.Parameters.AddWithValue("@p", password);
             cmd.Parameters.AddWithValue("@r", role);
