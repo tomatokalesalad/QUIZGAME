@@ -1,20 +1,31 @@
 ﻿using System;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Windows;
 using System.Windows.Controls;
+using QuizGame1WPF.Models;
 
 namespace QuizGame1WPF
 {
+    /// <summary>
+    /// Interaction logic for AddEditQuestionWindow.xaml
+    /// </summary>
     public partial class AddEditQuestionWindow : Window
     {
-        private const string ConnStr = @"Server=localhost;Database=QuizGameDB;Trusted_Connection=True;";
-        private readonly QuestionModel editingQuestion;
+        private const string ConnStr = @"Server=localhost\SQLEXPRESS;Database=QuizGameDB;Trusted_Connection=True;Encrypt=False;";
+        private readonly QuestionModel? editingQuestion;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AddEditQuestionWindow"/> class.
+        /// </summary>
         public AddEditQuestionWindow()
         {
             InitializeComponent();
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AddEditQuestionWindow"/> class for editing an existing question.
+        /// </summary>
+        /// <param name="question">The question to edit.</param>
         public AddEditQuestionWindow(QuestionModel question) : this()
         {
             editingQuestion = question;
@@ -30,6 +41,9 @@ namespace QuizGame1WPF
             cmbDifficulty.Text = question.Difficulty;
         }
 
+        /// <summary>
+        /// Handles the click event for saving a question.
+        /// </summary>
         private void Save_Click(object sender, RoutedEventArgs e)
         {
             string q = txtQuestion.Text.Trim();
@@ -37,9 +51,9 @@ namespace QuizGame1WPF
             string b = txtOptionB.Text.Trim();
             string c = txtOptionC.Text.Trim();
             string d = txtOptionD.Text.Trim();
-            string correct = (cmbCorrect.SelectedItem as ComboBoxItem)?.Content.ToString();
+            string? correct = (cmbCorrect.SelectedItem as ComboBoxItem)?.Content?.ToString();
             string cat = txtCategory.Text.Trim();
-            string diff = (cmbDifficulty.SelectedItem as ComboBoxItem)?.Content.ToString();
+            string? diff = (cmbDifficulty.SelectedItem as ComboBoxItem)?.Content?.ToString();
 
             if (string.IsNullOrEmpty(q) || string.IsNullOrEmpty(a) || string.IsNullOrEmpty(b) ||
                 string.IsNullOrEmpty(c) || string.IsNullOrEmpty(d) || string.IsNullOrEmpty(correct) ||
@@ -82,6 +96,9 @@ namespace QuizGame1WPF
             DialogResult = true; // close window and return success
         }
 
+        /// <summary>
+        /// Handles the click event for cancelling the operation.
+        /// </summary>
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = false;

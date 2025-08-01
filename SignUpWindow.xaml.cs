@@ -1,32 +1,53 @@
-﻿using System;
-using System.Data.SqlClient;
+﻿using QuizGame1WPF.Services;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 
 namespace QuizGame1WPF
 {
+    /// <summary>
+    /// Interaction logic for SignUpWindow.xaml
+    /// </summary>
     public partial class SignUpWindow : Window
     {
-        private const string ConnStr =
-            "Server=localhost\\SQLEXPRESS;Database=QuizGameDB;" +
-            "Trusted_Connection=True;Encrypt=True;TrustServerCertificate=True;";
+        private readonly IDatabaseService? _databaseService;
 
-        public SignUpWindow(string role)  // <-- constructor with role parameter
+        /// <summary>
+        /// Initializes a new instance of the SignUpWindow class with a database service and optional role.
+        /// </summary>
+        /// <param name="databaseService">The database service to use for user creation.</param>
+        /// <param name="role">The user role ("Student" or "Teacher").</param>
+        public SignUpWindow(IDatabaseService databaseService, string role = "")
         {
             InitializeComponent();
-            RoleBox.SelectedIndex = role == "Student" ? 0 : 1;  // Pre-select Student or Teacher
+            _databaseService = databaseService;
+            
+            if (!string.IsNullOrEmpty(role))
+            {
+                RoleBox.SelectedIndex = role == "Student" ? 0 : 1;
+            }
         }
 
-        public SignUpWindow()  // default constructor for XAML design-time support (optional)
+        /// <summary>
+        /// Initializes a new instance of the SignUpWindow class for design-time support.
+        /// </summary>
+        public SignUpWindow()
         {
             InitializeComponent();
+            // Fallback constructor for design-time support
         }
 
-        private void Create_Click(object sender, RoutedEventArgs e)
+        private async void Create_Click(object sender, RoutedEventArgs e)
         {
+            if (_databaseService == null)
+            {
+                MessageBox.Show("Database service not available.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
             string user = UserBox.Text.Trim();
             string pass = PassBox.Password;
-            string role = (RoleBox.SelectedItem as ComboBoxItem)?.Content.ToString();
+            string? role = (RoleBox.SelectedItem as ComboBoxItem)?.Content?.ToString();
             string id = IdBox.Text.Trim();
 
             if (string.IsNullOrEmpty(user) || string.IsNullOrEmpty(pass) ||
@@ -36,27 +57,24 @@ namespace QuizGame1WPF
                 return;
             }
 
-            using var con = new SqlConnection(ConnStr);
-            con.Open();
-
-            var chk = new SqlCommand("SELECT COUNT(*) FROM Users WHERE Username=@u", con);
-            chk.Parameters.AddWithValue("@u", user);
-            if ((int)chk.ExecuteScalar() > 0)
+            try
             {
-                MessageBox.Show("Username already taken.");
-                return;
+                bool success = await _databaseService.CreateUserAsync(user, pass, role, id);
+                
+                if (success)
+                {
+                    MessageBox.Show("Account created successfully!");
+                    Close();
+                }
+                else
+                {
+                    MessageBox.Show("Username already taken or an error occurred.");
+                }
             }
-
-            var cmd = new SqlCommand("INSERT INTO Users (Username, Password, Role, StudentID, InstructorID) VALUES (@u, @p, @r, @sid, @tid)", con);
-            cmd.Parameters.AddWithValue("@u", user);
-            cmd.Parameters.AddWithValue("@p", pass);
-            cmd.Parameters.AddWithValue("@r", role);
-            cmd.Parameters.AddWithValue("@sid", role == "Student" ? id : DBNull.Value);
-            cmd.Parameters.AddWithValue("@tid", role == "Teacher" ? id : DBNull.Value);
-            cmd.ExecuteNonQuery();
-
-            MessageBox.Show("Account created successfully!");
-            Close();
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error creating account: " + ex.Message);
+            }
         }
     }
 }
