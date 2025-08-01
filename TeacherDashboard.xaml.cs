@@ -118,5 +118,16 @@ namespace QuizGame1WPF
         {
 
         }
+
+        /// <summary>
+        /// Handles the click event for logout.
+        /// </summary>
+        private void Logout_Click(object sender, RoutedEventArgs e)
+        {
+            // Close the dashboard and return to login window
+            var loginWindow = new LoginWindow();
+            loginWindow.Show();
+            this.Close();
+        }
     }
 }

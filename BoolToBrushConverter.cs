@@ -20,11 +20,10 @@ namespace QuizGame1WPF
         /// <returns>A Brush based on the boolean value.</returns>
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is bool isCorrect)
-            {
-                return isCorrect ? Brushes.Green : Brushes.Red;
-            }
-            return Brushes.Transparent;
+            bool isCorrect = value is bool b && b;
+            return isCorrect
+                ? new SolidColorBrush(Color.FromRgb(34, 223, 34))   // #22DF22
+                : new SolidColorBrush(Color.FromRgb(223, 34, 34));  // #DF2222
         }
 
         /// <summary>
@@ -37,7 +36,7 @@ namespace QuizGame1WPF
         /// <returns>Throws NotImplementedException.</returns>
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
     }
 }

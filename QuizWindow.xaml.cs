@@ -1,8 +1,9 @@
+using System;
+using System.ComponentModel;
+using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
 using QuizGame1WPF.Models;
 using QuizGame1WPF.Services;
-using System.ComponentModel;
 
 namespace QuizGame1WPF
 {
@@ -12,8 +13,8 @@ namespace QuizGame1WPF
     public partial class QuizWindow : Window, INotifyPropertyChanged
     {
         private readonly IQuizService _quizService;
-        private TimerHelper _timer = null!;
         private QuizSession _quizSession;
+        private TimerHelper _timer = null!;
         private DateTime _questionStartTime;
 
         /// <summary>
@@ -52,9 +53,8 @@ namespace QuizGame1WPF
         /// <summary>
         /// Gets the progress percentage for the quiz.
         /// </summary>
-        public double ProgressPercentage => _quizSession.Questions.Count > 0 ? 
+        public double ProgressPercentage => _quizSession.Questions.Count > 0 ?
             (double)_quizSession.CurrentQuestionIndex / _quizSession.Questions.Count * 100 : 0;
-
         private QuestionModel? CurrentQuestion => _quizSession.CurrentQuestion;
 
         /// <summary>
@@ -71,9 +71,6 @@ namespace QuizGame1WPF
             LoadCurrentQuestion();
         }
 
-        /// <summary>
-        /// Loads the current question and updates the UI.
-        /// </summary>
         private void LoadCurrentQuestion()
         {
             if (CurrentQuestion == null)
@@ -81,16 +78,11 @@ namespace QuizGame1WPF
                 EndQuiz();
                 return;
             }
-
             _questionStartTime = DateTime.Now;
-            
-            // Clear previous selections
             optA.IsChecked = false;
             optB.IsChecked = false;
             optC.IsChecked = false;
             optD.IsChecked = false;
-            
-            // Update UI
             OnPropertyChanged(nameof(QuestionText));
             OnPropertyChanged(nameof(OptionA));
             OnPropertyChanged(nameof(OptionB));
@@ -99,82 +91,47 @@ namespace QuizGame1WPF
             OnPropertyChanged(nameof(ProgressText));
             OnPropertyChanged(nameof(ScoreText));
             OnPropertyChanged(nameof(ProgressPercentage));
-
             StartTimer();
         }
 
-        /// <summary>
-        /// Starts the timer for the current question.
-        /// </summary>
         private void StartTimer()
         {
-            _timer?.Stop(); // Stop previous timer if exists
+            _timer?.Stop();
             _timer = new TimerHelper();
-            
             int timeLimit = CurrentQuestion?.TimeLimitInSeconds ?? 30;
-            
             _timer.OnTick += (seconds) =>
             {
                 txtTimer.Text = $"Time Left: {seconds}s";
             };
-            
             _timer.OnTimeUp += () =>
             {
                 MessageBox.Show("Time's up!", "Time Expired", MessageBoxButton.OK, MessageBoxImage.Warning);
-                SubmitAnswer(""); // Submit with no answer
+                SubmitAnswer("");
             };
-            
             _timer.Start(timeLimit);
         }
 
-        /// <summary>
-        /// Handles the click event for submitting an answer.
-        /// </summary>
         private void Submit_Click(object sender, RoutedEventArgs e)
         {
             string selected = GetSelectedOption();
             if (string.IsNullOrEmpty(selected))
             {
-                MessageBox.Show("Please select an answer before submitting.", "No Answer Selected", 
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Please select an answer before submitting.", "No Answer Selected", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
-            
             SubmitAnswer(selected);
         }
 
-        /// <summary>
-        /// Submits the selected answer and processes the result.
-        /// </summary>
-        /// <param name="selectedAnswer">The selected answer.</param>
-        private void SubmitAnswer(string selectedAnswer)
+        private void Skip_Click(object sender, RoutedEventArgs e)
         {
-            _timer?.Stop();
-            
-            int timeSpent = (int)(DateTime.Now - _questionStartTime).TotalSeconds;
-            _quizSession.AddAnswer(selectedAnswer, timeSpent);
-            
-            var currentQ = CurrentQuestion;
-            if (currentQ != null)
+            var result = MessageBox.Show("Are you sure you want to skip this question? You will receive 0 points.",
+                "Skip Question", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result == MessageBoxResult.Yes)
             {
-                bool isCorrect = selectedAnswer == currentQ.CorrectAnswer;
-                var lastAnswer = _quizSession.Answers.LastOrDefault();
-                
-                string resultMessage = isCorrect 
-                    ? $"Correct! +{lastAnswer?.PointsEarned ?? 0} points" 
-                    : $"Wrong! The correct answer was: {currentQ.CorrectAnswer}";
-                
-                MessageBox.Show(resultMessage, isCorrect ? "Correct!" : "Incorrect", 
-                    MessageBoxButton.OK, isCorrect ? MessageBoxImage.Information : MessageBoxImage.Error);
+                SubmitAnswer("");
             }
-
-            MoveToNextQuestion();
         }
 
-        /// <summary>
-        /// Gets the selected option from the UI.
-        /// </summary>
-        /// <returns>The selected option as a string.</returns>
         private string GetSelectedOption()
         {
             if (optA.IsChecked == true) return "A";
@@ -184,9 +141,25 @@ namespace QuizGame1WPF
             return "";
         }
 
-        /// <summary>
-        /// Moves to the next question in the quiz.
-        /// </summary>
+        private void SubmitAnswer(string selectedAnswer)
+        {
+            _timer?.Stop();
+            int timeSpent = (int)(DateTime.Now - _questionStartTime).TotalSeconds;
+            _quizSession.AddAnswer(selectedAnswer, timeSpent);
+            var currentQ = CurrentQuestion;
+            if (currentQ != null)
+            {
+                bool isCorrect = selectedAnswer == currentQ.CorrectAnswer;
+                var lastAnswer = _quizSession.Answers.LastOrDefault();
+                string resultMessage = isCorrect
+                    ? $"Correct! +{lastAnswer?.PointsEarned ?? 0} points"
+                    : $"Wrong! The correct answer was: {currentQ.CorrectAnswer}";
+                MessageBox.Show(resultMessage, isCorrect ? "Correct!" : "Incorrect",
+                    MessageBoxButton.OK, isCorrect ? MessageBoxImage.Information : MessageBoxImage.Error);
+            }
+            MoveToNextQuestion();
+        }
+
         private void MoveToNextQuestion()
         {
             if (_quizSession.HasNextQuestion)
@@ -200,64 +173,21 @@ namespace QuizGame1WPF
             }
         }
 
-        /// <summary>
-        /// Ends the quiz and shows the results window.
-        /// </summary>
         private async void EndQuiz()
         {
             _timer?.Stop();
-            
             try
             {
                 await _quizService.SaveQuizSessionAsync(_quizSession);
-                
                 var resultsWindow = new QuizResultsWindow(_quizSession);
                 resultsWindow.Show();
-                
                 Close();
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error saving quiz results: {ex.Message}", "Error", 
-                    MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Error saving quiz results: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 Close();
             }
-        }
-
-        /// <summary>
-        /// Handles the click event for skipping a question.
-        /// </summary>
-        private void Skip_Click(object sender, RoutedEventArgs e)
-        {
-            var result = MessageBox.Show("Are you sure you want to skip this question? You will receive 0 points.", 
-                "Skip Question", MessageBoxButton.YesNo, MessageBoxImage.Question);
-            
-            if (result == MessageBoxResult.Yes)
-            {
-                SubmitAnswer(""); // Submit with no answer
-            }
-        }
-
-        /// <summary>
-        /// Handles the window closing event.
-        /// </summary>
-        /// <param name="e">Cancel event arguments.</param>
-        protected override void OnClosing(CancelEventArgs e)
-        {
-            if (!_quizSession.IsCompleted)
-            {
-                var result = MessageBox.Show("Are you sure you want to quit the quiz? Your progress will be lost.", 
-                    "Quit Quiz", MessageBoxButton.YesNo, MessageBoxImage.Question);
-                
-                if (result == MessageBoxResult.No)
-                {
-                    e.Cancel = true;
-                    return;
-                }
-            }
-            
-            _timer?.Stop();
-            base.OnClosing(e);
         }
 
         /// <summary>

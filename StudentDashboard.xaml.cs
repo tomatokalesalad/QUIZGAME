@@ -105,19 +105,23 @@ namespace QuizGame1WPF
                 "User Profile", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
+        private void ViewResults_Click(object sender, RoutedEventArgs e)
+        {
+            var resultsWindow = new QuizResultsWindow(new QuizSession {
+                UserId = _currentUser.ID,
+                Username = _currentUser.Username,
+                Questions = new List<QuestionModel>(),
+                Answers = new List<QuizAnswer>(),
+                Category = "All",
+                Difficulty = "All",
+                StartTime = DateTime.Now
+            });
+            resultsWindow.ShowDialog();
+        }
+
         private void Logout_Click(object sender, RoutedEventArgs e)
         {
-            var result = MessageBox.Show("Are you sure you want to logout?", "Logout", 
-                MessageBoxButton.YesNo, MessageBoxImage.Question);
-            
-            if (result == MessageBoxResult.Yes)
-            {
-                Close();
-                
-                // Show login window
-                var loginWindow = new LoginWindow();
-                loginWindow.Show();
-            }
+            Close();
         }
 
         /// <summary>

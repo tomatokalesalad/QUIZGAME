@@ -73,6 +73,11 @@
                         Background="#22FFD9" Foreground="#181A1B" BorderBrush="#22FFD9" BorderThickness="2"
                         Cursor="Hand" Margin="10,0,0,0"/>
             </StackPanel>
+
+            <!-- Log Out Button -->
+            <Button Content="Log Out" Click="Logout_Click" HorizontalAlignment="Right" Margin="10"
+                    Background="DodgerBlue" Foreground="White" BorderBrush="DodgerBlue" BorderThickness="2"
+                    FontWeight="Bold" Width="100" Height="40" Cursor="Hand"/>
         </Grid>
     </Border>
 </Window>
